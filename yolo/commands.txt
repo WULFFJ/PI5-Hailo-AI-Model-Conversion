@@ -1,0 +1,43 @@
+# Yolo Part of Raspberry PI 5 Model Conversion to HEF
+
+yolo train model=/home/shitshow/hailo_dfc/yolov11s.ptt data=/home/user/folder/dataset/data.yaml batch=24 epochs=150 imgsz=640 device=0 single_cls=True
+
+
+Yolo Train:
+
+Argument	Type	Default	Description
+model	str	None	Specifies the model file for training. Accepts a path to either a .pt pretrained model or a .yaml configuration file. Essential for defining the model structure or initializing weights.
+data	str	None	Path to the dataset configuration file (e.g., coco8.yaml). This file contains dataset-specific parameters, including paths to training and validation data, class names, and number of classes.
+epochs	int	100	Total number of training epochs. Each epoch represents a full pass over the entire dataset. Adjusting this value can affect training duration and model performance.
+patience	int	100	Number of epochs to wait without improvement in validation metrics before early stopping the training. Helps prevent overfitting by stopping training when performance plateaus.
+batch	int or float	16	Batch size, with three modes: set as an integer (e.g., batch=16), auto mode for 60% GPU memory utilization (batch=-1), or auto mode with specified utilization fraction (batch=0.70).
+imgsz	int or list	640	Target image size for training. All images are resized to this dimension before being fed into the model. Affects model accuracy and computational complexity.
+save	bool	TRUE	Enables saving of training checkpoints and final model weights. Useful for resuming training or model deployment.
+save_period	int	-1	Frequency of saving model checkpoints, specified in epochs. A value of -1 disables this feature. Useful for saving interim models during long training sessions.
+device	int or str or list	None	Specifies the computational device(s) for training: a single GPU (device=0), multiple GPUs (device=[0,1]), CPU (device=cpu), MPS for Apple silicon (device=mps), or auto-selection of most idle GPU (device=-1) or multiple idle GPUs (device=[-1,-1])
+pretrained	bool or str	TRUE	Determines whether to start training from a pretrained model. Can be a boolean value or a string path to a specific model from which to load weights. Enhances training efficiency and model performance.
+optimizer	str	'auto'	Choice of optimizer for training. Options include SGD, Adam, AdamW, NAdam, RAdam, RMSProp etc., or auto for automatic selection based on model configuration. Affects convergence speed and stability.
+single_cls	bool	FALSE	Treats all classes in multi-class datasets as a single class during training. Useful for binary classification tasks or when focusing on object presence rather than classification.
+classes	list[int]	None	Specifies a list of class IDs to train on. Useful for filtering out and focusing only on certain classes during training.
+
+
+
+
+yolo export model=/home/shitshow/hailo_dfc/yolov11s.pt format=onnx dynamic=False imgsz=640 batch=1 opset=13 nms=False simplify=True
+
+Yolo Export(ONNX):
+
+Argument	Type	Default	Description
+format	str	'torchscript'	Target format for the exported model, such as 'onnx', 'torchscript', 'engine' (TensorRT), or others. Each format enables compatibility with different deployment environments.
+imgsz	int or tuple	640	Desired image size for the model input. Can be an integer for square images (e.g., 640 for 640×640) or a tuple (height, width) for specific dimensions.
+keras	bool	FALSE	Enables export to Keras format for TensorFlow SavedModel, providing compatibility with TensorFlow serving and APIs.
+optimize	bool	FALSE	Applies optimization for mobile devices when exporting to TorchScript, potentially reducing model size and improving inference performance. Not compatible with NCNN format or CUDA devices.
+half	bool	FALSE	Enables FP16 (half-precision) quantization, reducing model size and potentially speeding up inference on supported hardware. Not compatible with INT8 quantization or CPU-only exports for ONNX.
+int8	bool	FALSE	Activates INT8 quantization, further compressing the model and speeding up inference with minimal accuracy loss, primarily for edge devices. When used with TensorRT, performs post-training quantization (PTQ).
+simplify	bool	TRUE	Simplifies the model graph for ONNX exports with onnxslim, potentially improving performance and compatibility with inference engines.
+opset	int	None	Specifies the ONNX opset version for compatibility with different ONNX parsers and runtimes. If not set, uses the latest supported version.
+batch	int	1	Specifies export model batch inference size or the maximum number of images the exported model will process concurrently in predict mode. For Edge TPU exports, this is automatically set to 1.
+device	str	None	Specifies the device for exporting: GPU (device=0), CPU (device=cpu), MPS for Apple silicon (device=mps) or DLA for NVIDIA Jetson (device=dla:0 or device=dla:1). TensorRT exports automatically use GPU.
+data	str	'coco8.yaml'	Path to the dataset configuration file (default: coco8.yaml), essential for INT8 quantization calibration. If not specified with INT8 enabled, a default dataset will be assigned.
+
+
