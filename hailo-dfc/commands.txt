@@ -1,0 +1,11 @@
+Hailo process:
+
+Convert ONNX to HAR
+hailo parser onnx yolov11s.onnx
+
+Optimize HAR
+hailo optimize yolov11s --har /home/shitshow/hailo_dfc/yolov11s.har --hw-arch hailo8l --model-script-path /home/shitshow/hailo_dfc/yolov11s.alls --calib-path /home/shitshow/hailo_dfc/calibration_images --classes1
+
+Export HEF
+hailomz compile --yaml /home/shitshow/hailo_dfc/yolov11s.yaml --har /home/shitshow/hailo_dfc/yolov11s.har --hw-arch hailo8l
+
